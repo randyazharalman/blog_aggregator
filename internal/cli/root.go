@@ -1,13 +1,16 @@
 package cli
 
 import (
+	"database/sql"
 	"fmt"
 
 	"github.com/randyazharalman/blog_aggregator/internal/config"
+	"github.com/randyazharalman/blog_aggregator/internal/database"
 	"github.com/spf13/cobra"
 )
 
 type State struct {
+	DB *database.Queries
 	Config *config.Config
 }
 
@@ -36,7 +39,19 @@ func initializeState(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("failed to read configuration: %w", err)
 	}
 
+	db, err := sql.Open("postgres", cfg.DbURL)
+	if err != nil {
+		return fmt.Errorf("failed to connect to database: %w", err)
+	}
+
+	if err := db.Ping(); err != nil {
+		return fmt.Errorf("failed to ping database: %w", err)
+	}
+
+	dbQueries := database.New(db)
+	
 	state = &State{
+		DB: dbQueries,
 		Config: &cfg,
 	}
 

@@ -8,7 +8,7 @@ import (
 
 const (
 	configFileName = ".gatorconfig.json"
-	DefaultDbURL   = "postgres://example"
+	DefaultDbURL   = "postgres://postgres:postgres@localhost:5432/gator?sslmode=disable"
 )
 
 // Config represents the structure of the configuration file

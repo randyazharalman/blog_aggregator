@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	_ "github.com/lib/pq"
 	"github.com/randyazharalman/blog_aggregator/internal/cli"
 )
 
