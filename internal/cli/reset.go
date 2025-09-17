@@ -1,7 +1,9 @@
 package cli
 
 import (
+	"context"
 	"fmt"
+	"os"
 
 	"github.com/randyazharalman/blog_aggregator/internal/config"
 	"github.com/spf13/cobra"
@@ -22,6 +24,12 @@ Use this command for testing or to start fresh.`,
 }
 
 func runReset(cmd *cobra.Command, args []string) error {
+
+	err := state.DB.DeleteAllUsers(context.Background())
+	if err != nil {
+		fmt.Printf("Error: Failed to delete users from database: %v\n", err)
+		os.Exit(1)
+	}
 
 	defaultConfig := config.Config{
 		DbURL: config.DefaultDbURL,

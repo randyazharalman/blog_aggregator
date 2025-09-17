@@ -65,4 +65,5 @@ func init() {
 	rootCmd.AddCommand(versionCmd)
 	rootCmd.AddCommand(resetCmd)
 	rootCmd.AddCommand(registerCmd)
+	rootCmd.AddCommand(usersCmd)
 }
