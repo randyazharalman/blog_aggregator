@@ -66,4 +66,5 @@ func init() {
 	rootCmd.AddCommand(resetCmd)
 	rootCmd.AddCommand(registerCmd)
 	rootCmd.AddCommand(usersCmd)
+	rootCmd.AddCommand(aggCmd)
 }
