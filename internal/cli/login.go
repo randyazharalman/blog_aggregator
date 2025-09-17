@@ -1,7 +1,10 @@
 package cli
 
 import (
+	"context"
+	"database/sql"
 	"fmt"
+	"os"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -25,6 +28,14 @@ func runLogin(cmd *cobra.Command, args []string) error {
 
 	if username == "" {
 		return fmt.Errorf("username cannot be empty")
+	}
+
+	_, err := state.DB.GetUser(context.Background(), username)
+	if err != nil {
+		if err == sql.ErrNoRows {
+				fmt.Printf("Error: User '%s' does not exist. Please register first with 'gator register %s'\n", username, username)
+				os.Exit(1)
+		}
 	}
 
 	if err := state.Config.SetUser(username); err != nil {
