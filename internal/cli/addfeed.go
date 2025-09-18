@@ -9,6 +9,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/randyazharalman/blog_aggregator/internal/database"
+	"github.com/randyazharalman/blog_aggregator/internal/rss"
 	"github.com/spf13/cobra"
 )
 
@@ -24,6 +25,10 @@ The url must be unique.`,
 }
 
 func runAddFeed(cmd *cobra.Command, args []string) error {
+	if state.Config.CurrentUserName == "" {
+		fmt.Println("Error: No user logged in. Please login first with 'gator login <username>'")
+		os.Exit(1)
+	}
 	name:= strings.TrimSpace(args[0])
 	url:= strings.TrimSpace(args[1])
 
@@ -37,6 +42,12 @@ func runAddFeed(cmd *cobra.Command, args []string) error {
 	currentUser, err := state.DB.GetUser(context.Background(), state.Config.CurrentUserName)
 	if err != nil {
 		return err
+	}
+
+	fmt.Printf("Validating feed at %s...\n", url)
+	_, err = rss.FetchFeed(context.Background(), url)
+	if err != nil {
+		return fmt.Errorf("failed to fetch RSS feed: %w", err)
 	}
 
 	feedParams := database.CreateFeedParams{
@@ -57,12 +68,26 @@ func runAddFeed(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("failed to create feed: %w", err)
 	}
 
-	fmt.Printf("✅ Feed '%s' has been created!\n", feed.Name)
+	feedFollowParams := database.CreateFeedFollowParams{
+		ID:        uuid.New(),
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
+		UserID:    currentUser.ID,
+		FeedID:    feed.ID,
+	}
+
+	feedFollow, err := state.DB.CreateFeedFollow(context.Background(), feedFollowParams)
+	if err != nil {
+		// Feed was created but follow failed - that's ok, continue
+		fmt.Printf("⚠️  Feed '%s' created but failed to automatically follow it: %v\n", name, err)
+	} else {
+		fmt.Printf("✅ Feed '%s' created and you are now following it!\n", feedFollow.FeedName)
+	}
+
 	fmt.Printf("Feed details:\n")
-	fmt.Printf("  ID: %s\n", feed.ID)
 	fmt.Printf("  Name: %s\n", feed.Name)
 	fmt.Printf("  URL: %s\n", feed.Url)
-	fmt.Printf("  User ID: %s\n", feed.UserID)
-	fmt.Printf("  Created: %s\n", feed.CreatedAt.Format(time.RFC3339))
+	fmt.Printf("  Created by: %s\n", state.Config.CurrentUserName)
+
 	return nil
 }
