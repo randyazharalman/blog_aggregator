@@ -68,4 +68,5 @@ func init() {
 	rootCmd.AddCommand(usersCmd)
 	rootCmd.AddCommand(aggCmd)
 	rootCmd.AddCommand(addFeedCmd)
+	rootCmd.AddCommand(feedsCmd)
 }
