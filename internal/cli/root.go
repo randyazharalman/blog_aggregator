@@ -67,4 +67,5 @@ func init() {
 	rootCmd.AddCommand(registerCmd)
 	rootCmd.AddCommand(usersCmd)
 	rootCmd.AddCommand(aggCmd)
+	rootCmd.AddCommand(addFeedCmd)
 }
