@@ -23,10 +23,10 @@ You cannot follow the same feed twice.`,
 	Example: `  gator follow https://blog.boot.dev/index.xml
   gator follow https://www.wagslane.dev/index.xml`,
 	Args: cobra.ExactArgs(1),
-	RunE: runFollow,
+	RunE: middlewareLoggedIn(runFollow),
 }
 
-func runFollow(cmd *cobra.Command, args []string) error {
+func runFollow(cmd *cobra.Command, args []string, user database.User) error {
 	if state.Config.CurrentUserName == "" {
 		fmt.Println("Error: No user logged in. Please login first with 'gator login <username>'")
 		os.Exit(1)

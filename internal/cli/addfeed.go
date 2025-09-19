@@ -21,10 +21,10 @@ var addFeedCmd = &cobra.Command{
 This will create a new feed with the specified name and url.
 The url must be unique.`,
 	Args: cobra.ExactArgs(2),
-	RunE: runAddFeed,
+	RunE: middlewareLoggedIn(runAddFeed),
 }
 
-func runAddFeed(cmd *cobra.Command, args []string) error {
+func runAddFeed(cmd *cobra.Command, args []string, user database.User) error {
 	if state.Config.CurrentUserName == "" {
 		fmt.Println("Error: No user logged in. Please login first with 'gator login <username>'")
 		os.Exit(1)

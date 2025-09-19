@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/randyazharalman/blog_aggregator/internal/database"
 	"github.com/spf13/cobra"
 )
 
@@ -15,10 +16,10 @@ var followingCmd = &cobra.Command{
 
 Shows the names of the feeds in alphabetical order.
 You must be logged in to use this command.`,
-	RunE: runFollowing,
+	RunE: middlewareLoggedIn(runFollowing),
 }
 
-func runFollowing(cmd *cobra.Command, args []string) error {
+func runFollowing(cmd *cobra.Command, args []string, user database.User) error {
 	if state.Config.CurrentUserName == "" {
 		fmt.Println("Error: No user logged in. Please login first with 'gator login <username>'")
 		os.Exit(1)
